@@ -1,43 +1,37 @@
-import React from 'react';
-import { Task } from './Task';
-import { Footer } from './Footer';
-import { Header } from './Header';
+import React, { useState } from 'react';
+import Task from './Task';
+import Footer from './Footer';
+import Header from './Header';
 
-class TodoList extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { tasks: [], filtered: 'all' };
-    this.props = props;
-    this.addTask = this.addTask.bind(this);
-    this.completedTask = this.completedTask.bind(this);
-    this.removeTask = this.removeTask.bind(this);
-    this.allComplited = this.allComplited.bind(this);
-    this.removeCompletedTask = this.removeCompletedTask.bind(this);
-    this.filtered = this.filtered.bind(this);
-    this.toggleEdit = this.toggleEdit.bind(this);
-    this.completedEdit = this.completedEdit.bind(this);
-    this.blurEdit = this.blurEdit.bind(this);
-    this.enterEdit = this.enterEdit.bind(this);
-    this.changeTask = this.changeTask.bind(this);
-  }
+const TodoList = () => {
+  const [state, setState] = useState({ tasks: [], filtered: 'all' });
+  const [newTask, setNewTask] = useState('');
 
-  blurEdit(event) {
+  const addNewTaskHandler = (e) => {
+    setNewTask(e.target.value);
+  };
+
+  const completedEdit = (event) => {
+    event.currentTarget.classList.remove('editing');
+  };
+
+  const blurEdit = (event) => {
     if (event.target.className === 'edit') {
-      this.completedEdit(event);
+      completedEdit(event);
     }
-  }
+  };
 
-  enterEdit(event) {
+  const enterEdit = (event) => {
     if (event.target.className === 'edit' && event.key === 'Enter') {
-      this.completedEdit(event);
+      completedEdit(event);
     }
-  }
+  };
 
-  changeTask(event, task) {
-    this.setState((state) => {
+  const changeTask = (event, task) => {
+    setState((state) => {
       return {
         ...state,
-        tasks: this.state.tasks.map((el) => {
+        tasks: state.tasks.map((el) => {
           if (el.id === task.id) {
             return {
               ...el,
@@ -49,26 +43,22 @@ class TodoList extends React.Component {
         }),
       };
     });
-  }
+  };
 
-  toggleEdit(event) {
+  const toggleEdit = (event) => {
     event.currentTarget.classList.add('editing');
     event.currentTarget.children[1].focus();
-  }
+  };
 
-  completedEdit(event) {
-    event.currentTarget.classList.remove('editing');
-  }
+  const filtered = (filter) => {
+    setState({ ...state, filtered: filter });
+  };
 
-  filtered(filter) {
-    this.setState({ ...this.state, filtered: filter });
-  }
-
-  allComplited() {
-    this.setState((state) => {
+  const allComplited = () => {
+    setState((state) => {
       const { tasks } = state;
-      let completed = true;
       const length = tasks.filter((task) => !task.completed).length;
+      let completed = true;
 
       if (length === 0) {
         completed = false;
@@ -79,94 +69,94 @@ class TodoList extends React.Component {
         tasks: tasks.map((task) => ({ ...task, completed: completed })),
       };
     });
-  }
+  };
 
-  addTask(event) {
+  const addTask = (event) => {
     if (event.key === 'Enter') {
-      this.setState((state) => {
-        const { tasks } = state;
+      setState((state) => {
         const task = {
           id: new Date().valueOf(),
-          name: event.target.value,
+          name: newTask,
           completed: false,
         };
+        setNewTask('');
 
-        event.target.value = '';
-
-        return { ...state, tasks: [...tasks, task] };
+        return { ...state, tasks: [...state.tasks, task] };
       });
     }
-  }
+  };
 
-  removeCompletedTask() {
-    this.setState((status) => ({
+  const removeCompletedTask = () => {
+    setState((status) => ({
       ...status,
       tasks: status.tasks.filter((el) => !el.completed),
     }));
-  }
+  };
 
-  removeTask(id) {
-    this.setState((status) => ({
+  const removeTask = (id) => {
+    setState((status) => ({
       ...status,
       tasks: status.tasks.filter((el) => el.id !== id),
     }));
-  }
+  };
 
-  completedTask(id) {
-    this.setState((state) => {
+  const completedTask = (id) => {
+    setState((state) => {
       return {
         tasks: state.tasks.map((task) =>
           task.id === id ? { ...task, completed: !task.completed } : { ...task }
         ),
       };
     });
-  }
+  };
 
-  render() {
-    return (
-      <section className="todoapp">
-        <Header addTask={this.addTask} />
-        <section style={{ display: 'block' }} className="main">
-          <input id="toggle-all" className="toggle-all" type="checkbox" />
-          {this.state.tasks.length !== 0 ? (
-            <label htmlFor="toggle-all" onClick={this.allComplited}>
-              Mark all as complete
-            </label>
-          ) : null}
-          <ul className="todo-list">
-            {this.state.tasks
-              .filter((task) => {
-                if (this.state.filtered === 'all') {
-                  return true;
-                }
+  return (
+    <section className="todoapp">
+      <Header
+        addTask={addTask}
+        addNewTaskHandler={addNewTaskHandler}
+        newTask={newTask}
+      />
+      <section style={{ display: 'block' }} className="main">
+        <input id="toggle-all" className="toggle-all" type="checkbox" />
+        {state.tasks.length !== 0 ? (
+          <label htmlFor="toggle-all" onClick={allComplited}>
+            Mark all as complete
+          </label>
+        ) : null}
+        <ul className="todo-list">
+          {state.tasks
+            .filter((task) => {
+              if (state.filtered === 'all') {
+                return true;
+              }
 
-                return this.state.filtered === task.completed;
-              })
-              .map((task) => (
-                <Task
-                  key={task.id}
-                  toggleEdit={this.toggleEdit}
-                  changeTask={this.changeTask}
-                  enterEdit={this.enterEdit}
-                  blurEdit={this.blurEdit}
-                  task={task}
-                  removeTask={this.removeTask}
-                  completedTask={this.completedTask}
-                />
-              ))}
-          </ul>
-          {this.state.tasks.length !== 0 ? (
-            <Footer
-              tasks={this.state.tasks}
-              filter={this.state.filtered}
-              filtered={this.filtered}
-              removeCompletedTask={this.removeCompletedTask}
-            />
-          ) : null}
-        </section>
+              return state.filtered === task.completed;
+            })
+            .map((task) => (
+              <Task
+                key={task.id}
+                toggleEdit={toggleEdit}
+                changeTask={changeTask}
+                enterEdit={enterEdit}
+                blurEdit={blurEdit}
+                task={task}
+                removeTask={removeTask}
+                completedTask={completedTask}
+              />
+            ))}
+        </ul>
+        {state.tasks.length !== 0 ? (
+          <Footer
+            tasks={state.tasks}
+            filter={state.filtered}
+            filtered={filtered}
+            removeCompletedTask={removeCompletedTask}
+          />
+        ) : null}
       </section>
-    );
-  }
-}
+    </section>
+  );
+};
 
 export default TodoList;

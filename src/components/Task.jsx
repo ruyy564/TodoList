@@ -1,41 +1,44 @@
 import React from 'react';
 
-export class Task extends React.Component {
-  constructor(props) {
-    super(props);
-    this.props = props;
-  }
-
-  render() {
-    return (
-      <li
-        onDoubleClick={this.props.toggleEdit}
-        className={this.props.task.completed ? ' completed ' : ''}
-        onBlur={this.props.blurEdit}
-        onKeyDown={this.props.enterEdit}
-      >
-        <div className="view">
-          <input
-            className="toggle"
-            type="checkbox"
-            onChange={() => {
-              this.props.completedTask(this.props.task.id);
-            }}
-            checked={this.props.task.completed}
-          />
-          <label>{this.props.task.name}</label>
-          <button
-            className="destroy"
-            onClick={() => this.props.removeTask(this.props.task.id)}
-          ></button>
-        </div>
+const Task = ({
+  toggleEdit,
+  task,
+  blurEdit,
+  enterEdit,
+  completedTask,
+  removeTask,
+  changeTask,
+}) => {
+  return (
+    <li
+      onDoubleClick={toggleEdit}
+      className={task.completed ? ' completed ' : ''}
+      onBlur={blurEdit}
+      onKeyDown={enterEdit}
+    >
+      <div className="view">
         <input
-          className="edit"
-          onChange={(e) => this.props.changeTask(e, this.props.task)}
-          type="text"
-          value={this.props.task.name}
+          className="toggle"
+          type="checkbox"
+          onChange={() => {
+            completedTask(task.id);
+          }}
+          checked={task.completed}
         />
-      </li>
-    );
-  }
-}
+        <label>{task.name}</label>
+        <button
+          className="destroy"
+          onClick={() => removeTask(task.id)}
+        ></button>
+      </div>
+      <input
+        className="edit"
+        onChange={(e) => changeTask(e, task)}
+        type="text"
+        value={task.name}
+      />
+    </li>
+  );
+};
+
+export default Task;
