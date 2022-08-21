@@ -1,6 +1,8 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
+const Footer = ({ tasks, removeCompletedTask }) => {
+  const isActiveLink = ({ isActive }) => (isActive ? 'selected' : '');
 
-const Footer = ({ tasks, filter, filtered, removeCompletedTask }) => {
   return (
     <footer className="footer">
       <span className="todo-count">
@@ -8,37 +10,19 @@ const Footer = ({ tasks, filter, filtered, removeCompletedTask }) => {
       </span>
       <ul className="filters">
         <li>
-          <a
-            href="#"
-            className={filter === 'all' ? 'selected' : null}
-            onClick={() => {
-              filtered('all');
-            }}
-          >
+          <NavLink to="/" className={isActiveLink}>
             All
-          </a>
+          </NavLink>
         </li>
         <li>
-          <a
-            href="#"
-            onClick={() => {
-              filtered(false);
-            }}
-            className={filter === false ? 'selected' : null}
-          >
+          <NavLink to="/active" className={isActiveLink}>
             Active
-          </a>
+          </NavLink>
         </li>
         <li>
-          <a
-            href="#"
-            onClick={() => {
-              filtered(true);
-            }}
-            className={filter === true ? 'selected' : null}
-          >
+          <NavLink to="/completed" className={isActiveLink}>
             Completed
-          </a>
+          </NavLink>
         </li>
       </ul>
       <button className="clear-completed" onClick={removeCompletedTask}>

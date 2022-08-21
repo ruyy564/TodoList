@@ -1,11 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Task from './Task';
 import Footer from './Footer';
 import Header from './Header';
 
-const TodoList = () => {
+const TodoList = ({ filters }) => {
   const [state, setState] = useState({ tasks: [], filtered: 'all' });
   const [newTask, setNewTask] = useState('');
+
+  useEffect(() => {
+    setState({ ...state, filtered: filters });
+  }, [filters]);
 
   const addNewTaskHandler = (e) => {
     setNewTask(e.target.value);
@@ -48,10 +52,6 @@ const TodoList = () => {
   const toggleEdit = (event) => {
     event.currentTarget.classList.add('editing');
     event.currentTarget.children[1].focus();
-  };
-
-  const filtered = (filter) => {
-    setState({ ...state, filtered: filter });
   };
 
   const allComplited = () => {
@@ -103,6 +103,7 @@ const TodoList = () => {
   const completedTask = (id) => {
     setState((state) => {
       return {
+        ...state,
         tasks: state.tasks.map((task) =>
           task.id === id ? { ...task, completed: !task.completed } : { ...task }
         ),
@@ -149,8 +150,6 @@ const TodoList = () => {
         {state.tasks.length !== 0 ? (
           <Footer
             tasks={state.tasks}
-            filter={state.filtered}
-            filtered={filtered}
             removeCompletedTask={removeCompletedTask}
           />
         ) : null}
